@@ -1,34 +1,40 @@
-
-const users = require("../Models/user");
+const User = require("../Models/user");
 
 const userController = {
- 
-  getAllUsers: (req, res) => {
-    res.status(200).json(users);
-  },
-
- 
-  getUserById: (req, res) => {
-    const user = users.find(u => u.id == req.params.id);
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ message: "User not found" });
+  getAllUsers: async (req, res) => {
+    try {
+      const users = await User.find();
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
   },
 
+  getUserById: async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id);
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
 
-  addUser: (req, res) => {
-    const newUser = {
-      id: users.length + 1, 
-      name: req.body.name,
-      email: req.body.email
-    };
-
-    users.push(newUser);
-    res.status(201).json(newUser);
+  addUser: async (req, res) => {
+    try {
+      const newUser = await User.create({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+      });
+      res.status(201).json(newUser);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
 };
 
 module.exports = userController;
-

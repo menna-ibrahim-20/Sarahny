@@ -1,29 +1,33 @@
-const messages = require("../Models/message");
+const Message = require("../Models/message");
 
 const messageController = {
- 
-  getMessagesForUser: (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const userMessages = messages.filter(msg => msg.userId === userId);
+  getMessagesForUser: async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const userMessages = await Message.find({ recevierId: userId });
 
-    if (userMessages.length > 0) {
-      res.json(userMessages);
-    } else {
-      res.status(404).json({ message: "No messages found for this user" });
+      if (userMessages.length > 0) {
+        res.json(userMessages);
+      } else {
+        res.status(404).json({ message: "No messages found for this user" });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
   },
 
- 
-  addMessage: (req, res) => {
-    const newMessage = {
-      id: messages.length + 1,
-      userId: parseInt(req.body.userId), 
-      text: req.body.text,
-      anonymous: req.body.anonymous ?? true 
-    };
-
-    messages.push(newMessage);
-    res.status(201).json(newMessage);
+  addMessage: async (req, res) => {
+    try {
+      const newMessage = await Message.create({
+        recevierId: req.body.userId,
+        senderId: req.body.senderId || null,
+        content: req.body.text,
+        isAnonymous: req.body.anonymous ?? true
+      });
+      res.status(201).json(newMessage);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
 };
 
