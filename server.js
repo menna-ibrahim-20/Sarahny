@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require("express");
+const cors = require("cors");
 const app = express();
 
 const connectDB = require("./DB/connection");
@@ -8,6 +9,7 @@ const connectDB = require("./DB/connection");
 const userRoutes = require("./routes/user.route");
 const messageRoutes = require("./routes/message.route");
 
+app.use(cors());
 app.use(express.json());
 
 // ننتظر الاتصال بالداتابيز قبل معالجة أي طلب
